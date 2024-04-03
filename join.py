@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import getopt
-import optparse
+import argparse
 import re
 
 def raw_lines(file):
@@ -68,25 +68,21 @@ def sort_file(input):
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
-        showBanner()
+        print("Airodump Joiner\nJoin Two Airodump CSV Files\n\n\t-i\tInput Files [ foo_name_1 foo_name_2 foo_name_3 .....] \n\t-o\tOutput File\n")
         sys.exit(1)
 
-    parser = optparse.OptionParser("usage: %prog [options] arg1 arg2 arg3 .....")
-    parser.add_option("-o", "--output", dest="output", nargs=1, help="output file to write to")
-    parser.add_option("-i", "--file", dest="filename", nargs=2, help="Input files to read data from requires at least two arguments")
+    parser = argparse.ArgumentParser(description="Airodump Joiner")
+    parser.add_argument("-o", "--output", dest="output", nargs=1, required=True, help="output file to write to")
+    parser.add_argument("-i", "--file", dest="filename", nargs='+', required=True, help="Input files to read data from, requires at least two arguments")
 
-    (options, args) = parser.parse_args()
-    filenames = options.filename
-    outfile = options.output
-    if outfile is None:
-        print("You must provide a file name to write out to. IE... -o foo.csv\n")
-        showBanner()
-        sys.exit(1)
-    elif filenames is None:
+    args = parser.parse_args()
+    filenames = args.filename
+    outfile = args.output
+
+    if len(filenames) < 2:
         print("You must provide at least two file names to join. IE... -i foo1.csv foo2.csv\n")
-        showBanner()
+        print("Airodump Joiner\nJoin Two Airodump CSV Files\n\n\t-i\tInput Files [ foo_name_1 foo_name_2 foo_name_3 .....] \n\t-o\tOutput File\n")
         sys.exit(1)
-    for file_name in args:
-        filenames += (file_name,)
+
     return_var = file_pool(filenames)
     return_var = join_write(return_var, outfile[0])
